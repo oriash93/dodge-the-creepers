@@ -40,5 +40,12 @@ Main (MobTimer.timeout)   → spawns Mob instance
 
 ### Input Actions (defined in `project.godot`)
 
-- `move_left/right/up/down` → Arrow keys
-- `start_game` → Return key
+- `move_left/right/up/down` → Arrow keys or WASD
+- `start_game` → Return key or Space
+
+### Persistence
+
+- High score saved to `user://highscore.dat` via `FileAccess` (32-bit int)
+- On Windows: `%APPDATA%\Godot\app_userdata\dodge the creepers\highscore.dat`
+- Loaded in `Main._ready()`, saved in `Main.game_over()` when score exceeds previous best
+- HUD displays current best as "Best: X" below the live score label
