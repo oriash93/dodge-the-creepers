@@ -22,6 +22,9 @@ func show_game_over():
 func update_score(score):
 	$ScoreLabel.text = str(score)
 
+func update_high_score(high_score):
+	$HighScoreLabel.text = "Best: " + str(high_score)
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.

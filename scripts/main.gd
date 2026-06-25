@@ -2,19 +2,26 @@ extends Node
 
 @export var mob_scene: PackedScene
 var score
+var high_score := 0
+const SAVE_PATH = "user://highscore.dat"
 
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
-	#new_game()
-	pass
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+	if FileAccess.file_exists(SAVE_PATH):
+		var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
+		high_score = file.get_32()
+		file.close()
+	$HUD.update_high_score(high_score)
 
 
 func game_over():
+	if score > high_score:
+		high_score = score
+		var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+		file.store_32(high_score)
+		file.close()
+		$HUD.update_high_score(high_score)
+
 	$HUD.show_game_over()
 
 	$ScoreTimer.stop()
