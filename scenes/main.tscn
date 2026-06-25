@@ -39,7 +39,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.71643937, 0.74899787, 0.9788676, 1)
+color = Color(0.025682617, 0.3162432, 0.6486128, 1)
 
 [node name="Player" parent="." unique_id=441740023 instance=ExtResource("1_o5qli")]
 
