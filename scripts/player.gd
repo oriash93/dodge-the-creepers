@@ -4,11 +4,22 @@ signal hit
 
 @export var speed: int = 400
 var screen_size: Vector2
+var touch_active: bool = false
+var touch_target: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
 	hide()
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		touch_active = event.pressed
+		if event.pressed:
+			touch_target = get_viewport().get_screen_transform().affine_inverse() * event.position
+	elif event is InputEventScreenDrag:
+		touch_target = get_viewport().get_screen_transform().affine_inverse() * event.position
 
 
 func _process(delta: float) -> void:
@@ -21,6 +32,11 @@ func _process(delta: float) -> void:
 		velocity.y += 1
 	if Input.is_action_pressed("move_up"):
 		velocity.y -= 1
+
+	if touch_active and velocity == Vector2.ZERO:
+		var to_target: Vector2 = touch_target - position
+		if to_target.length() > 4.0:
+			velocity = to_target.normalized()
 
 	if velocity.length() > 0:
 		velocity = velocity.normalized() * speed
@@ -49,5 +65,6 @@ func _on_body_entered(_body: Node2D) -> void:
 
 func start(pos: Vector2) -> void:
 	position = pos
+	touch_active = false
 	show()
 	$CollisionShape2D.disabled = false
