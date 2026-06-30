@@ -1,9 +1,10 @@
 extends Node
 
+const SAVE_PATH: String = "user://highscore.dat"
+
 @export var mob_scene: PackedScene
 var score: int = 0
 var high_score: int = 0
-const SAVE_PATH: String = "user://highscore.dat"
 
 
 func _ready() -> void:
