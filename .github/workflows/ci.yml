@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - "*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: GDScript lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install gdtoolkit
+        run: pip install "gdtoolkit==4.*"
+
+      - name: Lint
+        run: gdlint scripts/
+
+  export:
+    name: HTML5 export
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: "4.6.0"
+          use-dotnet: false
+          include-templates: true
+
+      - name: Import project
+        run: godot --headless --import || true
+
+      - name: Export Web
+        run: mkdir -p build && godot --headless --export-release "Web" build/index.html
+
+      - name: Verify output
+        run: |
+          test -f build/index.html
+          test -f build/index.wasm
+          test -f build/index.pck
