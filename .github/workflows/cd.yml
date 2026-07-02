@@ -6,11 +6,11 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  deploy:
-    name: Export and deploy to Cloudflare Pages
+  publish:
+    name: Export and publish GitHub Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,19 +27,16 @@ jobs:
         run: godot --headless --import || true
 
       - name: Export Web
-        run: mkdir -p build && godot --headless --export-release "Web" build/index.html
+        run: mkdir -p build && godot --headless --export-release "Web" build/dodge-the-creepers.html
 
-      - name: Add headers
+      - name: Create release archive
+        run: cd build && zip -r ../game-export.zip .
+
+      - name: Publish GitHub Release
         run: |
-          cat > build/_headers << 'EOF'
-          /*
-            Cross-Origin-Opener-Policy: same-origin
-            Cross-Origin-Embedder-Policy: require-corp
-          EOF
-
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy build --project-name=dodge-the-creepers
+          TAG="build-${GITHUB_SHA:0:7}"
+          gh release create "$TAG" game-export.zip \
+            --title "Build ${GITHUB_SHA:0:7}" \
+            --notes "Automated build from commit [\`${GITHUB_SHA:0:7}\`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
+        env:
+          GH_TOKEN: ${{ github.token }}
