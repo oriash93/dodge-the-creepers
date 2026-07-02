@@ -6,15 +6,27 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  deploy:
-    name: Export and deploy to Cloudflare Pages
+  publish:
+    name: Bump version, export, and publish GitHub Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Bump version tag
+        id: tag
+        run: |
+          LATEST=$(git tag --sort=-v:refname | grep '^v' | head -1 || echo "v0.0")
+          IFS='.' read -r major minor <<< "${LATEST#v}"
+          NEW_TAG="v${major}.$((minor + 1))"
+          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
+          git tag "$NEW_TAG"
+          git push origin "$NEW_TAG"
 
       - name: Set up Godot
         uses: chickensoft-games/setup-godot@v2
@@ -27,19 +39,15 @@ jobs:
         run: godot --headless --import || true
 
       - name: Export Web
-        run: mkdir -p build && godot --headless --export-release "Web" build/index.html
+        run: mkdir -p build && godot --headless --export-release "Web" build/dodge-the-creepers.html
 
-      - name: Add headers
+      - name: Create release archive
+        run: cd build && zip -r ../game-export.zip .
+
+      - name: Publish GitHub Release
         run: |
-          cat > build/_headers << 'EOF'
-          /*
-            Cross-Origin-Opener-Policy: same-origin
-            Cross-Origin-Embedder-Policy: require-corp
-          EOF
-
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy build --project-name=dodge-the-creepers
+          gh release create "${{ steps.tag.outputs.tag }}" game-export.zip \
+            --title "${{ steps.tag.outputs.tag }}" \
+            --notes "Automated build from commit [\`${GITHUB_SHA:0:7}\`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
+        env:
+          GH_TOKEN: ${{ github.token }}
