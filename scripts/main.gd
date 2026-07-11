@@ -76,3 +76,7 @@ func _on_score_timer_timeout() -> void:
 func _on_start_timer_timeout() -> void:
 	$MobTimer.start()
 	$ScoreTimer.start()
+
+
+func _on_hud_quit_game() -> void:
+	get_tree().quit()
