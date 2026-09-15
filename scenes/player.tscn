@@ -32,15 +32,15 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ur7pv"]
-radius = 27.0
-height = 68.0
+radius = 19.0
+height = 48.0
 
 [node name="Player" type="Area2D" unique_id=441740023]
 script = ExtResource("1_qlg0r")
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1201137818]
-scale = Vector2(0.5, 0.5)
+scale = Vector2(0.35, 0.35)
 sprite_frames = SubResource("SpriteFrames_smehm")
 animation = &"walk"
 

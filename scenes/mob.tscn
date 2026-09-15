@@ -45,8 +45,8 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_h8ps3"]
-radius = 36.0
-height = 98.0
+radius = 25.0
+height = 69.0
 
 [node name="Mob" type="RigidBody2D" unique_id=1071814177]
 collision_mask = 0
@@ -55,7 +55,7 @@ script = ExtResource("1_ebxvl")
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2049568007]
-scale = Vector2(0.75, 0.75)
+scale = Vector2(0.525, 0.525)
 sprite_frames = SubResource("SpriteFrames_m0elm")
 animation = &"walk"
 frame_progress = 0.28782892
