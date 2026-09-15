@@ -3,8 +3,10 @@ extends Node
 const SAVE_PATH: String = "user://highscore.dat"
 
 @export var mob_scene: PackedScene
+@export var power_up_scene: PackedScene
 var score: int = 0
 var high_score: int = 0
+var power_up: Area2D = null
 
 
 func _ready() -> void:
@@ -27,6 +29,11 @@ func game_over() -> void:
 
 	$ScoreTimer.stop()
 	$MobTimer.stop()
+	$PowerUpTimer.stop()
+
+	if is_instance_valid(power_up):
+		power_up.queue_free()
+		power_up = null
 
 	$Music.stop()
 	$DeathSound.play()
@@ -73,9 +80,26 @@ func _on_score_timer_timeout() -> void:
 	$HUD.update_score(score)
 
 
+func _on_power_up_timer_timeout() -> void:
+	power_up = power_up_scene.instantiate() as Area2D
+	power_up.collected.connect(_on_power_up_collected)
+
+	var screen_size: Vector2 = get_viewport().get_visible_rect().size
+	power_up.position = Vector2(randf_range(0.0, screen_size.x), randf_range(0.0, screen_size.y))
+
+	add_child(power_up)
+	$PowerUpTimer.stop()
+
+
+func _on_power_up_collected() -> void:
+	power_up = null
+	$PowerUpTimer.start()
+
+
 func _on_start_timer_timeout() -> void:
 	$MobTimer.start()
 	$ScoreTimer.start()
+	$PowerUpTimer.start()
 
 
 func _on_hud_quit_game() -> void:
