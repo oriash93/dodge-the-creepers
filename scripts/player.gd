@@ -3,11 +3,11 @@ extends Area2D
 signal hit
 
 @export var speed: int = 400
-var screen_size: Vector2
+var play_area: Rect2
 
 
 func _ready() -> void:
-	screen_size = get_viewport_rect().size
+	play_area = Rect2(Vector2.ZERO, get_viewport_rect().size)
 	hide()
 
 
@@ -29,7 +29,7 @@ func _process(delta: float) -> void:
 		$AnimatedSprite2D.stop()
 
 	position += velocity * delta
-	position = position.clamp(Vector2.ZERO, screen_size)
+	position = position.clamp(play_area.position, play_area.end)
 
 	if velocity.x != 0:
 		$AnimatedSprite2D.animation = "walk"
