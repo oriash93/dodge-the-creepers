@@ -1,15 +1,24 @@
 extends Node
 
 const SAVE_PATH: String = "user://highscore.dat"
+const TOP_BAR_HEIGHT: float = 80.0
+const BOTTOM_BAR_HEIGHT: float = 72.0
 
 @export var mob_scene: PackedScene
 @export var power_up_scene: PackedScene
 var score: int = 0
 var high_score: int = 0
 var power_up: Area2D = null
+var play_area: Rect2
 
 
 func _ready() -> void:
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	play_area = Rect2(
+		Vector2(0, TOP_BAR_HEIGHT),
+		viewport_size - Vector2(0, TOP_BAR_HEIGHT + BOTTOM_BAR_HEIGHT)
+	)
+
 	if FileAccess.file_exists(SAVE_PATH):
 		var file: FileAccess = FileAccess.open(SAVE_PATH, FileAccess.READ)
 		high_score = file.get_32()
@@ -48,6 +57,7 @@ func new_game() -> void:
 	$HUD.show_message("Get Ready")
 
 	$Player.start($StartPosition.position)
+	$Player.play_area = play_area
 	$StartTimer.start()
 
 	$Music.play()
@@ -84,8 +94,10 @@ func _on_power_up_timer_timeout() -> void:
 	power_up = power_up_scene.instantiate() as Area2D
 	power_up.collected.connect(_on_power_up_collected)
 
-	var screen_size: Vector2 = get_viewport().get_visible_rect().size
-	power_up.position = Vector2(randf_range(0.0, screen_size.x), randf_range(0.0, screen_size.y))
+	power_up.position = Vector2(
+		randf_range(play_area.position.x, play_area.end.x),
+		randf_range(play_area.position.y, play_area.end.y)
+	)
 
 	add_child(power_up)
 	$PowerUpTimer.stop()
