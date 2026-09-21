@@ -4,6 +4,8 @@ signal hit
 
 @export var speed: int = 400
 var play_area: Rect2
+var invincible: bool = false
+var blink_tween: Tween
 
 
 func _ready() -> void:
@@ -40,7 +42,30 @@ func _process(delta: float) -> void:
 		$AnimatedSprite2D.flip_v = velocity.y > 0
 
 
+func set_invincible(duration: float) -> void:
+	invincible = true
+	$InvincibilityTimer.start(duration)
+	var tween: Tween = create_tween().set_loops()
+	tween.tween_property(self, "modulate:a", 0.35, 0.15)
+	tween.tween_property(self, "modulate:a", 1.0, 0.15)
+	blink_tween = tween
+
+
+func _end_invincibility() -> void:
+	invincible = false
+	if blink_tween:
+		blink_tween.kill()
+		blink_tween = null
+	modulate.a = 1.0
+
+
+func _on_invincibility_timer_timeout() -> void:
+	_end_invincibility()
+
+
 func _on_body_entered(_body: Node2D) -> void:
+	if invincible:
+		return
 	hide()
 	hit.emit()
 	# Must be deferred as we can't change physics properties on a physics callback.
@@ -49,5 +74,7 @@ func _on_body_entered(_body: Node2D) -> void:
 
 func start(pos: Vector2) -> void:
 	position = pos
+	_end_invincibility()
+	$InvincibilityTimer.stop()
 	show()
 	$CollisionShape2D.disabled = false

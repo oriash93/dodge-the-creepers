@@ -3,12 +3,16 @@ extends Node
 const SAVE_PATH: String = "user://highscore.dat"
 const TOP_BAR_HEIGHT: float = 80.0
 const BOTTOM_BAR_HEIGHT: float = 72.0
+const INVINCIBILITY_DURATION: float = 8.0
+const NO_EFFECT: int = -1
+const PowerUpScript: GDScript = preload("res://scripts/power_up.gd")
 
 @export var mob_scene: PackedScene
 @export var power_up_scene: PackedScene
 var score: int = 0
 var high_score: int = 0
 var power_up: Area2D = null
+var standby_effect: int = NO_EFFECT
 var play_area: Rect2
 
 
@@ -43,6 +47,9 @@ func game_over() -> void:
 	if is_instance_valid(power_up):
 		power_up.queue_free()
 		power_up = null
+
+	standby_effect = NO_EFFECT
+	$HUD.hide_active_power_up()
 
 	$Music.stop()
 	$DeathSound.play()
@@ -92,7 +99,9 @@ func _on_score_timer_timeout() -> void:
 
 func _on_power_up_timer_timeout() -> void:
 	power_up = power_up_scene.instantiate() as Area2D
+	power_up.effect_type = PowerUpScript.Effect.values().pick_random()
 	power_up.collected.connect(_on_power_up_collected)
+	power_up.expired.connect(_on_power_up_expired)
 
 	power_up.position = Vector2(
 		randf_range(play_area.position.x, play_area.end.x),
@@ -103,9 +112,33 @@ func _on_power_up_timer_timeout() -> void:
 	$PowerUpTimer.stop()
 
 
-func _on_power_up_collected() -> void:
+func _on_power_up_collected(effect: int) -> void:
+	power_up = null
+	standby_effect = effect
+	$HUD.show_active_power_up(PowerUpScript.COLORS[effect])
+
+
+func _on_power_up_expired() -> void:
 	power_up = null
 	$PowerUpTimer.start()
+
+
+func _on_use_power_up_pressed() -> void:
+	if standby_effect == NO_EFFECT:
+		return
+	match standby_effect:
+		PowerUpScript.Effect.INVINCIBILITY:
+			$Player.set_invincible(INVINCIBILITY_DURATION)
+		PowerUpScript.Effect.CLEAR_MOBS:
+			get_tree().call_group("mobs", "queue_free")
+	standby_effect = NO_EFFECT
+	$HUD.hide_active_power_up()
+	$PowerUpTimer.start()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("use_power_up"):
+		_on_use_power_up_pressed()
 
 
 func _on_start_timer_timeout() -> void:
