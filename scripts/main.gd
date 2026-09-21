@@ -5,15 +5,37 @@ const TOP_BAR_HEIGHT: float = 80.0
 const BOTTOM_BAR_HEIGHT: float = 72.0
 const INVINCIBILITY_DURATION: float = 8.0
 const NO_EFFECT: int = -1
+const PASSIVE_EFFECTS: Dictionary = {
+	"speed": {
+		"name": "Swift Feet", "desc": "+10% player speed", "max": 5,
+		"color": Color(0.3, 0.9, 0.3),
+	},
+	"slow": {
+		"name": "Sluggish Foes", "desc": "Mobs 15% slower", "max": 4,
+		"color": Color(0.3, 0.5, 1.0),
+	},
+	"shield": {
+		"name": "Shield", "desc": "Absorbs 1 hit", "max": 3,
+		"color": Color(0.4, 1.0, 1.0),
+	},
+}
+const PASSIVE_OPTION_COUNT: int = 3
+const SPEED_STEP: float = 0.1
+const MOB_SLOW_STEP: float = 0.15
+const MOB_SPEED_FLOOR: float = 0.4
 const PowerUpScript: GDScript = preload("res://scripts/power_up.gd")
 
 @export var mob_scene: PackedScene
 @export var power_up_scene: PackedScene
+@export var passive_menu_scene: PackedScene
 var score: int = 0
 var high_score: int = 0
 var power_up: Area2D = null
 var standby_effect: int = NO_EFFECT
 var play_area: Rect2
+var passive_stacks: Dictionary = {}
+var mob_speed_multiplier: float = 1.0
+var passive_menu: CanvasLayer
 
 
 func _ready() -> void:
@@ -29,6 +51,11 @@ func _ready() -> void:
 		file.close()
 	$HUD.update_high_score(high_score)
 
+	passive_menu = passive_menu_scene.instantiate() as CanvasLayer
+	passive_menu.chosen.connect(_on_passive_chosen)
+	add_child(passive_menu)
+	$Player.shield_used.connect(_refresh_passive_hud)
+
 
 func game_over() -> void:
 	if score > high_score:
@@ -43,6 +70,7 @@ func game_over() -> void:
 	$ScoreTimer.stop()
 	$MobTimer.stop()
 	$PowerUpTimer.stop()
+	$PassivePowerUpTimer.stop()
 
 	if is_instance_valid(power_up):
 		power_up.queue_free()
@@ -59,6 +87,9 @@ func new_game() -> void:
 	get_tree().call_group("mobs", "queue_free")
 
 	score = 0
+	passive_stacks.clear()
+	mob_speed_multiplier = 1.0
+	$HUD.update_passive_icons({})
 
 	$HUD.update_score(score)
 	$HUD.show_message("Get Ready")
@@ -86,7 +117,7 @@ func _on_mob_timer_timeout() -> void:
 	direction += randf_range(-PI / 4, PI / 4)
 	mob.rotation = direction
 
-	var velocity: Vector2 = Vector2(randf_range(150.0, 250.0), 0.0)
+	var velocity: Vector2 = Vector2(randf_range(150.0, 250.0) * mob_speed_multiplier, 0.0)
 	mob.linear_velocity = velocity.rotated(direction)
 
 	add_child(mob)
@@ -145,7 +176,54 @@ func _on_start_timer_timeout() -> void:
 	$MobTimer.start()
 	$ScoreTimer.start()
 	$PowerUpTimer.start()
+	$PassivePowerUpTimer.start()
 
 
 func _on_hud_quit_game() -> void:
 	get_tree().quit()
+
+
+func _stack_count(id: String) -> int:
+	if id == "shield":
+		return $Player.shield_charges
+	return passive_stacks.get(id, 0)
+
+
+func _roll_passive_options() -> Array:
+	var pool: Array = PASSIVE_EFFECTS.keys().filter(
+		func(id: String) -> bool: return _stack_count(id) < PASSIVE_EFFECTS[id]["max"]
+	)
+	pool.shuffle()
+	return pool.slice(0, PASSIVE_OPTION_COUNT)
+
+
+func _on_passive_power_up_timer_timeout() -> void:
+	var options: Array = _roll_passive_options()
+	if options.is_empty():
+		return
+	passive_menu.show_options(options, PASSIVE_EFFECTS)
+	get_tree().paused = true
+
+
+func _on_passive_chosen(id: String) -> void:
+	if id == "shield":
+		$Player.shield_charges += 1
+	else:
+		passive_stacks[id] = _stack_count(id) + 1
+		_apply_passive_stacks()
+	_refresh_passive_hud()
+	get_tree().paused = false
+
+
+func _apply_passive_stacks() -> void:
+	$Player.speed_multiplier = 1.0 + SPEED_STEP * passive_stacks.get("speed", 0)
+	mob_speed_multiplier = maxf(MOB_SPEED_FLOOR, 1.0 - MOB_SLOW_STEP * passive_stacks.get("slow", 0))
+
+
+func _refresh_passive_hud() -> void:
+	var entries: Dictionary = {}
+	for id in PASSIVE_EFFECTS:
+		var count: int = _stack_count(id)
+		if count > 0:
+			entries[id] = {"color": PASSIVE_EFFECTS[id]["color"], "count": count}
+	$HUD.update_passive_icons(entries)
