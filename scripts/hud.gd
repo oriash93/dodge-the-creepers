@@ -4,6 +4,7 @@ signal start_game
 signal quit_game
 
 @onready var is_web: bool = OS.has_feature("web")
+var passive_icons: Dictionary = {}
 
 
 func _ready() -> void:
@@ -41,6 +42,31 @@ func show_active_power_up(color: Color) -> void:
 func hide_active_power_up() -> void:
 	$ActiveSlotIcon.hide()
 	$ActiveSlotLabel.hide()
+
+
+func update_passive_icons(entries: Dictionary) -> void:
+	for icon in passive_icons.values():
+		icon.hide()
+	for id in entries:
+		var icon: ColorRect = passive_icons.get(id)
+		if icon == null:
+			icon = _create_passive_icon()
+			passive_icons[id] = icon
+		icon.color = entries[id]["color"]
+		icon.get_child(0).text = "x%d" % entries[id]["count"]
+		icon.show()
+
+
+func _create_passive_icon() -> ColorRect:
+	var icon: ColorRect = ColorRect.new()
+	icon.custom_minimum_size = Vector2(32, 32)
+	var label: Label = Label.new()
+	label.add_theme_font_override("font", $ScoreLabel.get_theme_font("font"))
+	label.add_theme_font_size_override("font_size", 16)
+	label.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	icon.add_child(label)
+	$PassiveRow.add_child(icon)
+	return icon
 
 
 func update_score(score: int) -> void:
