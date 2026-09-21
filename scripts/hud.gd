@@ -3,8 +3,8 @@ extends CanvasLayer
 signal start_game
 signal quit_game
 
-@onready var is_web: bool = OS.has_feature("web")
 var passive_icons: Dictionary = {}
+@onready var is_web: bool = OS.has_feature("web")
 
 
 func _ready() -> void:

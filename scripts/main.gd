@@ -6,9 +6,18 @@ const BOTTOM_BAR_HEIGHT: float = 72.0
 const INVINCIBILITY_DURATION: float = 8.0
 const NO_EFFECT: int = -1
 const PASSIVE_EFFECTS: Dictionary = {
-	"speed": {"name": "Swift Feet", "desc": "+10% player speed", "max": 5, "color": Color(0.3, 0.9, 0.3)},
-	"slow": {"name": "Sluggish Foes", "desc": "Mobs 15% slower", "max": 4, "color": Color(0.3, 0.5, 1.0)},
-	"shield": {"name": "Shield", "desc": "Absorbs 1 hit", "max": 3, "color": Color(0.4, 1.0, 1.0)},
+	"speed": {
+		"name": "Swift Feet", "desc": "+10% player speed", "max": 5,
+		"color": Color(0.3, 0.9, 0.3),
+	},
+	"slow": {
+		"name": "Sluggish Foes", "desc": "Mobs 15% slower", "max": 4,
+		"color": Color(0.3, 0.5, 1.0),
+	},
+	"shield": {
+		"name": "Shield", "desc": "Absorbs 1 hit", "max": 3,
+		"color": Color(0.4, 1.0, 1.0),
+	},
 }
 const PASSIVE_OPTION_COUNT: int = 3
 const SPEED_STEP: float = 0.1
