@@ -47,4 +47,8 @@ animation = &"walk"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=604629786]
 shape = SubResource("CapsuleShape2D_ur7pv")
 
+[node name="InvincibilityTimer" type="Timer" parent="." unique_id=730582914]
+one_shot = true
+
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="InvincibilityTimer" to="." method="_on_invincibility_timer_timeout"]

@@ -32,6 +32,17 @@ func show_game_over() -> void:
 		$QuitButton.show()
 
 
+func show_active_power_up(color: Color) -> void:
+	$ActiveSlotIcon.color = color
+	$ActiveSlotIcon.show()
+	$ActiveSlotLabel.show()
+
+
+func hide_active_power_up() -> void:
+	$ActiveSlotIcon.hide()
+	$ActiveSlotLabel.hide()
+
+
 func update_score(score: int) -> void:
 	$ScoreLabel.text = str(score)
 
