@@ -1,0 +1,40 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/passive_power_up_menu.gd" id="1_menu"]
+[ext_resource type="FontFile" path="res://assets/fonts/Xolonium-Regular.ttf" id="2_font"]
+
+[node name="PassivePowerUpMenu" type="CanvasLayer" unique_id=518273640]
+process_mode = 3
+layer = 10
+visible = false
+script = ExtResource("1_menu")
+
+[node name="Dim" type="ColorRect" parent="." unique_id=518273641]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Center" type="CenterContainer" parent="." unique_id=518273642]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Options" type="VBoxContainer" parent="Center" unique_id=518273643]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Center/Options" unique_id=518273644]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 32
+text = "Choose a power-up"
+horizontal_alignment = 1
+
+[node name="Buttons" type="VBoxContainer" parent="Center/Options" unique_id=518273645]
+layout_mode = 2
+theme_override_constants/separation = 16

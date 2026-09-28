@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://cpwgp464jydl8" path="res://scenes/player.tscn" id="1_o5qli"]
 [ext_resource type="PackedScene" uid="uid://dasgpty3tjx6v" path="res://scenes/mob.tscn" id="2_sugp2"]
 [ext_resource type="PackedScene" path="res://scenes/power_up.tscn" id="3_pwrup"]
+[ext_resource type="PackedScene" path="res://scenes/passive_power_up_menu.tscn" id="7_pmenu"]
 [ext_resource type="PackedScene" uid="uid://cec0i4phydqu5" path="res://scenes/hud.tscn" id="4_jyhfs"]
 [ext_resource type="AudioStream" uid="uid://mlm5bx45j4k8" path="res://assets/art/gameover.wav" id="5_tbgi4"]
 
@@ -34,6 +35,7 @@ loop = true
 script = ExtResource("1_0wfyh")
 mob_scene = ExtResource("2_sugp2")
 power_up_scene = ExtResource("3_pwrup")
+passive_menu_scene = ExtResource("7_pmenu")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1514572037]
 anchors_preset = 15
@@ -52,6 +54,9 @@ wait_time = 0.5
 
 [node name="PowerUpTimer" type="Timer" parent="." unique_id=3311098245]
 wait_time = 8.0
+
+[node name="PassivePowerUpTimer" type="Timer" parent="." unique_id=3311098246]
+wait_time = 10.0
 
 [node name="StartTimer" type="Timer" parent="." unique_id=1166705063]
 wait_time = 2.0
@@ -78,6 +83,7 @@ stream = ExtResource("5_tbgi4")
 [connection signal="timeout" from="MobTimer" to="." method="_on_mob_timer_timeout"]
 [connection signal="timeout" from="ScoreTimer" to="." method="_on_score_timer_timeout"]
 [connection signal="timeout" from="PowerUpTimer" to="." method="_on_power_up_timer_timeout"]
+[connection signal="timeout" from="PassivePowerUpTimer" to="." method="_on_passive_power_up_timer_timeout"]
 [connection signal="timeout" from="StartTimer" to="." method="_on_start_timer_timeout"]
 [connection signal="start_game" from="HUD" to="." method="new_game"]
 [connection signal="quit_game" from="HUD" to="." method="_on_hud_quit_game"]

@@ -56,7 +56,22 @@ theme_override_font_sizes/font_size = 18
 text = "[Shift] to use"
 vertical_alignment = 1
 
-[node name="ScoreLabel"type="Label" parent="." unique_id=1263226960]
+[node name="PassiveRow" type="HBoxContainer" parent="." unique_id=4102938477]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -260.0
+offset_top = -52.0
+offset_right = -16.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/separation = 12
+alignment = 2
+
+[node name="ScoreLabel" type="Label" parent="." unique_id=1263226960]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
