@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Engine & Build
 
-- **Engine**: Godot 4.7.2 — installed at `C:\Users\orias\Desktop\Godot_v4.7.2-stable_win64.exe`
+- **Engine**: Godot 4.7.2
 - **No external build tools** — Godot handles compilation, running, and exporting natively
 - **To run the game**: Open the project in the Godot editor and press F5, or use the editor's play button
 - **Export targets** (configured in `export_presets.cfg`):
