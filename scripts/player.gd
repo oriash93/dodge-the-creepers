@@ -1,3 +1,4 @@
+class_name Player
 extends Area2D
 
 signal hit
@@ -6,6 +7,10 @@ signal hit
 var play_area: Rect2
 var invincible: bool = false
 var blink_tween: Tween
+
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var collision_shape: CollisionShape2D = $CollisionShape2D
+@onready var invincibility_timer: Timer = $InvincibilityTimer
 
 
 func _ready() -> void:
@@ -26,25 +31,25 @@ func _process(delta: float) -> void:
 
 	if velocity.length() > 0:
 		velocity = velocity.normalized() * speed
-		$AnimatedSprite2D.play()
+		sprite.play()
 	else:
-		$AnimatedSprite2D.stop()
+		sprite.stop()
 
 	position += velocity * delta
 	position = position.clamp(play_area.position, play_area.end)
 
 	if velocity.x != 0:
-		$AnimatedSprite2D.animation = "walk"
-		$AnimatedSprite2D.flip_v = false
-		$AnimatedSprite2D.flip_h = velocity.x < 0
+		sprite.animation = "walk"
+		sprite.flip_v = false
+		sprite.flip_h = velocity.x < 0
 	elif velocity.y != 0:
-		$AnimatedSprite2D.animation = "up"
-		$AnimatedSprite2D.flip_v = velocity.y > 0
+		sprite.animation = "up"
+		sprite.flip_v = velocity.y > 0
 
 
 func set_invincible(duration: float) -> void:
 	invincible = true
-	$InvincibilityTimer.start(duration)
+	invincibility_timer.start(duration)
 	var tween: Tween = create_tween().set_loops()
 	tween.tween_property(self, "modulate:a", 0.35, 0.15)
 	tween.tween_property(self, "modulate:a", 1.0, 0.15)
@@ -69,12 +74,12 @@ func _on_body_entered(_body: Node2D) -> void:
 	hide()
 	hit.emit()
 	# Must be deferred as we can't change physics properties on a physics callback.
-	$CollisionShape2D.set_deferred("disabled", true)
+	collision_shape.set_deferred("disabled", true)
 
 
 func start(pos: Vector2) -> void:
 	position = pos
 	_end_invincibility()
-	$InvincibilityTimer.stop()
+	invincibility_timer.stop()
 	show()
-	$CollisionShape2D.disabled = false
+	collision_shape.disabled = false
