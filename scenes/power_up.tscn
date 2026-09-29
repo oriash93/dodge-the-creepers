@@ -1,17 +1,17 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://co6158yse02lx"]
 
 [ext_resource type="Script" uid="uid://b8babffe4fqbj" path="res://scripts/power_up.gd" id="1_p0wr0"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_p0wr0"]
 radius = 16.0
 
-[node name="PowerUp" type="Area2D"]
+[node name="PowerUp" type="Area2D" unique_id=453038348]
 script = ExtResource("1_p0wr0")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1789335259]
 shape = SubResource("CircleShape2D_p0wr0")
 
-[node name="DespawnTimer" type="Timer" parent="."]
+[node name="DespawnTimer" type="Timer" parent="." unique_id=2001777267]
 wait_time = 6.0
 one_shot = true
 
